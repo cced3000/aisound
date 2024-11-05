@@ -7,6 +7,8 @@ from openai import OpenAI
 # 加载环境变量
 load_dotenv()
 
+# 配置缓存
+# 使用 Streamlit secrets 替代环境变量
 @st.cache_resource
 def get_clients():
     """初始化并缓存API客户端"""
@@ -40,7 +42,7 @@ def generate_system_prompt(content: str) -> str:
         st.error(f"翻译失败: {str(e)}")
         return None
 
-def generate_sound_effect(text: str) -> bytes:
+def generate_sound_effect(text: str, duration: int = 10, influence: float = 0.3) -> bytes:
     """生成声音效果"""
     try:
         elevenlabs, _ = get_clients()
@@ -52,8 +54,8 @@ def generate_sound_effect(text: str) -> bytes:
             
         result = elevenlabs.text_to_sound_effects.convert(
             text=en_text,
-            duration_seconds=10,
-            prompt_influence=0.3,
+            duration_seconds=duration,
+            prompt_influence=influence,
         )
         
         return b"".join(list(result))
@@ -84,7 +86,11 @@ def main():
             
         try:
             with st.spinner("正在生成声音..."):
-                audio_data = generate_sound_effect(text_input)
+                audio_data = generate_sound_effect(
+                    text_input,
+                    duration=duration,
+                    influence=influence
+                )
                 st.audio(audio_data, format="audio/mp3")
                 st.success("声音生成成功!")
         except Exception as e:
