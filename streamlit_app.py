@@ -7,16 +7,15 @@ from openai import OpenAI
 # 加载环境变量
 load_dotenv()
 
-# 配置缓存
 @st.cache_resource
 def get_clients():
     """初始化并缓存API客户端"""
     elevenlabs_client = ElevenLabs(
-        api_key=os.getenv('ELEVENLABS_API_KEY')  # API key移到环境变量中
+        api_key=st.secrets["ELEVENLABS_API_KEY"]
     )
     openai_client = OpenAI(
-        base_url=os.getenv('OPENAI_BASE_URL'),
-        api_key=os.getenv('OPENAI_API_KEY')
+        base_url=st.secrets["OPENAI_BASE_URL"],
+        api_key=st.secrets["OPENAI_API_KEY"]
     )
     return elevenlabs_client, openai_client
 
